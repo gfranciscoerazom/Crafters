@@ -192,7 +192,18 @@ def create_user(
     db.add(new_user)
     db.commit()
 
-    return RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
+    token = create_access_token(
+        {
+            "id": new_user.id,
+            "email": new_user.email,
+        },
+        timedelta(minutes=30)
+    )
+
+    response = RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
+    response.set_cookie(key="access_token", value=token, httponly=True)
+    return response
+    # return RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
 
 
 # region log-in

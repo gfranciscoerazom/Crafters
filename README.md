@@ -20,12 +20,13 @@ A step by step guide to get the development environment up and running.
 
 1. Create a virtual environment with `python -m venv env`
 2. Activate the virtual environment with `source env/bin/activate` on Linux or `env\Scripts\activate` on Windows
-3. Install the dependencies with `pip install -r requirements.txt` or `pip install "fastapi[all]" sqlalchemy psycopg2 alembic bcrypt`
+3. Install the dependencies with `pip install -r requirements.txt` or `pip install "fastapi[all]" sqlalchemy psycopg2 alembic bcrypt "python-jose[cryptography]"`
     * `"fastapi[all]"` is the FastAPI framework with all optional dependencies included.
     * `sqlalchemy` is the SQL toolkit and Object-Relational Mapping (ORM) library for Python.
     * `psycopg2` is the PostgreSQL adapter for the Python programming language.
     * `alembic` is a lightweight database migration tool for SQLAlchemy.
     * `bcrypt` is a hashing library for passwords.
+    * `"python-jose[cryptography]"` is a JavaScript Object Signing and Encryption library for Python.
 4. Run the application with `python main.py`
 
 ## Usage

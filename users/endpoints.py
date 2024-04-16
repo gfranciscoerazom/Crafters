@@ -2,7 +2,7 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 import bcrypt
-from fastapi import APIRouter, Form, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 # Import the APIRouter class to create a router
 from fastapi.templating import Jinja2Templates
@@ -20,6 +20,9 @@ router = APIRouter(
 
 # Create a template object to render the HTML files
 templates = Jinja2Templates(directory="users/templates")
+
+SECRET_KEY = "Petierunt uti sibi concilium totius Galliae in diem certam indicere. Morbi fringilla convallis sapien, id pulvinar odio volutpat. A communi observantia non est recedendum."
+ALGORITHM = "HS256"
 
 # region helper functions
 
@@ -93,20 +96,69 @@ def create_access_token(data: dict, expires_delta: timedelta) -> str:
 
     encoded_jwt = jwt.encode(
         to_encode,
-        "Petierunt uti sibi concilium totius Galliae in diem certam indicere. Morbi fringilla convallis sapien, id pulvinar odio volutpat. A communi observantia non est recedendum.",
-        algorithm="HS256"
+        SECRET_KEY,
+        algorithm=ALGORITHM,
     )
     return encoded_jwt
 
 
+# Revisar si usar TypedDict
+# Ver si pone en una función el HTTPException
+# Falta documentar
+def get_current_user(request: Request) -> dict:
+    token = request.cookies.get("access_token", None)
+
+    if not token:
+        request.session["error_message"] = "Please log in first."
+
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,  # revisar el 306
+            detail="Access token not found.",
+            headers={"Location": "/users/log-in"},
+        )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("email", None)
+        id = payload.get("id", None)
+
+        if not email or not id:
+            request.session["error_message"] = "Invalid token. ljljljl"
+
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid token.",
+                headers={"Location": "/users/log-in"},
+            )
+
+    except jwt.JWTError:
+        request.session["error_message"] = "Invalid token."
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token.",
+            headers={"Location": "/users/log-in"},
+        )
+
+    return {"id": id, "email": email}
+
+
+user_dependency = Annotated[dict, Depends(get_current_user)]
+
 # region endpoints
+
+
 @router.get("/", response_class=HTMLResponse)
-def read_users(request: Request):
+def read_users(
+    request: Request,
+    user: user_dependency
+):
     """
     Retrieve the index page.
 
     Parameters:
         request (Request): The incoming request object.
+        user (dict): The user of the session.
 
     Returns:
         TemplateResponse: The rendered index.html template with the request object.

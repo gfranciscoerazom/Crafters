@@ -2,7 +2,7 @@
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 import bcrypt
-from fastapi import APIRouter, Form, Request, status
+from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 # Import the APIRouter class to create a router
 from fastapi.templating import Jinja2Templates
@@ -171,10 +171,11 @@ def create_user(
     user = db.query(User).filter(User.email == email).first()
 
     if user:
-        return templates.TemplateResponse("sign-up.html", {
-            "request": request,
-            "message": "The email is already registered.",
-        })
+        request.session["error_message"] = "The email is already registered try to log in."
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            headers={"Location": "/users/log-in"},
+        )
 
     if password != password_confirmation:
         return templates.TemplateResponse("sign-up.html", {
@@ -203,7 +204,6 @@ def create_user(
     response = RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(key="access_token", value=token, httponly=True)
     return response
-    # return RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
 
 
 # region log-in
@@ -223,8 +223,11 @@ def log_in(request: Request):
     Returns:
         TemplateResponse: The rendered log-in.html template with the request object.
     """
+    message = request.session.get("error_message", None)
+
     return templates.TemplateResponse("log-in.html", {
         "request": request,
+        "message": message,
     })
 
 

@@ -123,7 +123,7 @@ def get_current_user(request: Request) -> dict:
         id = payload.get("id", None)
 
         if not email or not id:
-            request.session["error_message"] = "Invalid token. ljljljl"
+            request.session["error_message"] = "Invalid token."
 
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -277,6 +277,9 @@ def log_in(request: Request):
     """
     message = request.session.get("error_message", None)
 
+    if message:
+        del request.session["error_message"]
+
     return templates.TemplateResponse("log-in.html", {
         "request": request,
         "message": message,
@@ -320,4 +323,27 @@ def log_in_user(request: Request, db: db_dependency, email: Annotated[str, Form(
 
     response = RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
     response.set_cookie(key="access_token", value=token, httponly=True)
+    return response
+
+# region log-out
+
+
+@router.get(
+    "/log-out",
+    response_class=RedirectResponse,
+    status_code=status.HTTP_302_FOUND,
+    description="Log-out a user.",
+)
+def log_out():
+    """
+    Log-out a user.
+
+    Returns:
+        RedirectResponse: Redirects to the log-in page.
+    """
+    response = RedirectResponse(
+        "/users/log-in",
+        status_code=status.HTTP_302_FOUND
+    )
+    response.delete_cookie("access_token")
     return response

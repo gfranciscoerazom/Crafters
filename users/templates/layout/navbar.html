@@ -37,6 +37,14 @@
                 <li class="nav-item">
                     <a class="nav-link disabled" aria-disabled="true">Link</a>
                 </li>
+                <!-- Si no está seteada la cookie access_token, no mostrar el siguiente elemento -->
+                {% if request.cookies.access_token %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/users/log-out">
+                        <i class="bi bi-box-arrow-right"> Log Out</i>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
 
             <!-- Search form -->

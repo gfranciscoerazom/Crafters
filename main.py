@@ -1,10 +1,14 @@
 from fastapi.staticfiles import StaticFiles
 import uvicorn  # Library for serving the API
 from fastapi import FastAPI  # Import the FastAPI class
-from db.db_connection import engine  # Import the engine for the database
+# Import the engine for the database
+from db.db_connection import SessionLocal, engine
 import db.schema as schema  # Import the schema for the database
+from db.schema import User  # Import the User class from the schema
 from users import endpoints  # Import the endpoints for the users
 from starlette.middleware.sessions import SessionMiddleware
+
+from users.helpers.password_encryption import hash_password
 
 app = FastAPI()  # Create an instance of the FastAPI class
 
@@ -20,6 +24,23 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Include the routers from the endpoints
 app.include_router(endpoints.router)
+
+
+db = SessionLocal()
+admin_user = db.query(User).filter(User.first_name == "admin").first()
+
+if admin_user is None:
+    user = User(
+        first_name="admin",
+        last_name="admin",
+        role="admin",
+        email="admin@admin.admin",
+        hashed_password=hash_password("admin")
+    )
+    db.add(user)
+    db.commit()
+
+db.close()
 
 # Entry point for the API
 if __name__ == "__main__":

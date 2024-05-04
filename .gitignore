@@ -1,3 +1,4 @@
+.vscode/
 # No rastrear todos los archivos con nombre secret.json
 secret.json
 

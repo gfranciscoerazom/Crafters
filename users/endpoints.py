@@ -1,15 +1,14 @@
 # region imports
-from datetime import UTC, datetime, timedelta
 from typing import Annotated
-import bcrypt
-from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
+from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 # Import the APIRouter class to create a router
 from fastapi.templating import Jinja2Templates
 from db.db_connection import db_dependency
 from db.schema import User
-from sqlalchemy.orm import Session
-from jose import jwt
+from users.helpers.authenticate_user import authenticate_user
+from users.helpers.jwt_token import set_user_token_cookie, user_dependency
+from users.helpers.password_encryption import hash_password
 
 # region setup
 # Create the router for the users
@@ -19,135 +18,10 @@ router = APIRouter(
 )
 
 # Create a template object to render the HTML files
-templates = Jinja2Templates(directory="users/templates")
+templates = Jinja2Templates(directory="templates")
 
-SECRET_KEY = "Petierunt uti sibi concilium totius Galliae in diem certam indicere. Morbi fringilla convallis sapien, id pulvinar odio volutpat. A communi observantia non est recedendum."
-ALGORITHM = "HS256"
-
-# region helper functions
-
-
-def hash_password(password: str) -> bytes:
-    """
-    Hashes a password using bcrypt.
-
-    Args:
-        password (str): The password to hash.
-
-    Returns:
-        bytes: The hashed password.
-    """
-    pwd_bytes = password.encode('utf-8')
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
-    return hashed_password
-
-
-def verify_password(plain_password, hashed_password) -> bool:
-    """
-    Verifies if a plain password matches a hashed password.
-
-    Args:
-        plain_password (str): The plain password to verify.
-        hashed_password (bytes): The hashed password to compare against.
-
-    Returns:
-        bool: True if the passwords match, False otherwise.
-    """
-    password_byte_enc = plain_password.encode('utf-8')
-    return bcrypt.checkpw(password=password_byte_enc, hashed_password=hashed_password)
-
-
-def authenticate_user(db: Session, email: str, password: str) -> User:
-    """
-    Authenticates a user by checking if the email and password match a user in the database.
-
-    Args:
-        db (Session): The database session.
-        email (str): The email of the user.
-        password (str): The password of the user.
-
-    Returns:
-        User: The user if the email and password match, None otherwise.
-    """
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        return None
-    if not verify_password(password, user.hashed_password):
-        return None
-    return user
-
-
-def create_access_token(data: dict, expires_delta: timedelta) -> str:
-    """
-    Creates an access token.
-
-    Args:
-        data (dict): The data to encode in the token.
-        expires_delta (timedelta): The expiration time of the token.
-
-    Returns:
-        str: The access token.
-    """
-    to_encode = data.copy()
-
-    expire = datetime.now(UTC) + expires_delta
-    to_encode.update({"exp": expire})
-
-    encoded_jwt = jwt.encode(
-        to_encode,
-        SECRET_KEY,
-        algorithm=ALGORITHM,
-    )
-    return encoded_jwt
-
-
-# Revisar si usar TypedDict
-# Ver si pone en una función el HTTPException
-# Falta documentar
-def get_current_user(request: Request) -> dict:
-    token = request.cookies.get("access_token", None)
-
-    if not token:
-        request.session["error_message"] = "Please log in first."
-
-        raise HTTPException(
-            status_code=status.HTTP_303_SEE_OTHER,  # revisar el 306
-            detail="Access token not found.",
-            headers={"Location": "/users/log-in"},
-        )
-
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("email", None)
-        id = payload.get("id", None)
-
-        if not email or not id:
-            request.session["error_message"] = "Invalid token."
-
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token.",
-                headers={"Location": "/users/log-in"},
-            )
-
-    except jwt.JWTError:
-        request.session["error_message"] = "Invalid token."
-
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid token.",
-            headers={"Location": "/users/log-in"},
-        )
-
-    return {"id": id, "email": email}
-
-
-user_dependency = Annotated[dict, Depends(get_current_user)]
 
 # region endpoints
-
-
 @router.get("/", response_class=HTMLResponse)
 def read_users(
     request: Request,
@@ -163,7 +37,7 @@ def read_users(
     Returns:
         TemplateResponse: The rendered index.html template with the request object.
     """
-    return templates.TemplateResponse("index.html", {
+    return templates.TemplateResponse("users/index.html", {
         "request": request,
     })
 
@@ -185,7 +59,7 @@ def sign_up(request: Request):
     Returns:
         TemplateResponse: The rendered sign-up.html template with the request object.
     """
-    return templates.TemplateResponse("sign-up.html", {
+    return templates.TemplateResponse("users/sign-up.html", {
         "request": request,
     })
 
@@ -230,7 +104,7 @@ def create_user(
         )
 
     if password != password_confirmation:
-        return templates.TemplateResponse("sign-up.html", {
+        return templates.TemplateResponse("users/sign-up.html", {
             "request": request,
             "message": "The passwords do not match.",
         })
@@ -245,17 +119,7 @@ def create_user(
     db.add(new_user)
     db.commit()
 
-    token = create_access_token(
-        {
-            "id": new_user.id,
-            "email": new_user.email,
-        },
-        timedelta(minutes=30)
-    )
-
-    response = RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
-    response.set_cookie(key="access_token", value=token, httponly=True)
-    return response
+    return set_user_token_cookie(new_user, "/users/")
 
 
 # region log-in
@@ -280,7 +144,7 @@ def log_in(request: Request):
     if message:
         del request.session["error_message"]
 
-    return templates.TemplateResponse("log-in.html", {
+    return templates.TemplateResponse("users/log-in.html", {
         "request": request,
         "message": message,
     })
@@ -308,22 +172,12 @@ def log_in_user(request: Request, db: db_dependency, email: Annotated[str, Form(
     user = authenticate_user(db, email, password)
 
     if not user:
-        return templates.TemplateResponse("log-in.html", {
+        return templates.TemplateResponse("users/log-in.html", {
             "request": request,
             "message": "Invalid email or password.",
         })
 
-    token = create_access_token(
-        {
-            "id": user.id,
-            "email": user.email,
-        },
-        timedelta(minutes=30)
-    )
-
-    response = RedirectResponse("/users/", status_code=status.HTTP_302_FOUND)
-    response.set_cookie(key="access_token", value=token, httponly=True)
-    return response
+    return set_user_token_cookie(user, "/users/")
 
 # region log-out
 

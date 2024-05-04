@@ -1,6 +1,15 @@
+from typing import TypedDict
 from sqlalchemy import Boolean, Column, Integer, String, DateTime
 from .db_connection import Base
 from datetime import datetime
+
+
+class UserDict(TypedDict):
+    id: int
+    email: str
+    first_name: str
+    last_name: str
+    role: str
 
 
 class User(Base):
@@ -28,3 +37,12 @@ class User(Base):
     role = Column(String, default='user')
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.now)
+
+    def to_UserDict(self) -> UserDict:
+        return {
+            "id": self.id,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "role": self.role,
+        }

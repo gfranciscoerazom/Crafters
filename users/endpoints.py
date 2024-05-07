@@ -39,6 +39,7 @@ def read_users(
     """
     return templates.TemplateResponse("users/index.html", {
         "request": request,
+        "role": user["role"],
     })
 
 

@@ -24,5 +24,6 @@ def welcome_admin(
         "admin/index.html",
         {
             "request": request,
+            "role": user["role"],
         }
     )

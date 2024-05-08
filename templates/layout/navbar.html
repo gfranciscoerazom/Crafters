@@ -36,11 +36,25 @@
 
                 <!-- ADMIN PANEL -->
                 {% if role == "admin" %} <!-- No mostrar este link si el usuario no es admin -->
-                <li class="nav-item">
-                    <a class="nav-link {% if request.path.startswith('/admin/') %}active{% endif %}"
-                        href="/admin/">Admin panel</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.path.startswith('/admin/') %}active{% endif %}"
+                        href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Admin
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/admin/">Admin panel</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/admin/create-user/">Create user</a></li>
+                    </ul>
                 </li>
                 {% endif %}
+
+                <li class="nav-item">
+                    <a class="nav-link {% if request.path.startswith('/users/') %}active{% endif %}"
+                        href="/users/">Users panel</a>
+                </li>
 
                 <!-- LOGOUT -->
                 {% if request.cookies.access_token %} <!-- No mostrar este link si no existe la cookie access_token -->

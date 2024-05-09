@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from db.db_connection import db_dependency
-from db.schema import Career, Faculty, Skill, User
+from db.schema import Career, Faculty, Skill, User, UserSkill
 from users.helpers.jwt_token import user_dependency
 from users.helpers.password_encryption import hash_password
 
@@ -74,8 +74,6 @@ def create_user_post(
     role: Annotated[str, Form(...)],
     skill: Annotated[list, Form(...)],
 ):
-    print(f"{skill=}")
-
     if user["role"] != "admin":
         return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -131,6 +129,11 @@ def create_user_post(
     )
 
     db.add(new_user)
+    db.commit()
+
+    for skill_id in skill:
+        db.add(UserSkill(user_id=new_user.id, skill_id=skill_id))
+
     db.commit()
 
     return templates.TemplateResponse(
@@ -287,27 +290,6 @@ def create_career(request: Request, user: user_dependency, db: db_dependency):
     )
 
 
-# class Career(Base):
-#     """
-#     Represents a career that a user can take.
-
-#     Attributes:
-#         id (int): The unique identifier for the career.
-#         name (str): The name of the career.
-#         description (str): The description of the career.
-#         semesters (int): The number of semesters of the career.
-#         credits (int): The number of credits of the career.
-#         faculty_id (int): The unique identifier for the faculty.
-#     """
-
-#     __tablename__ = 'careers'
-
-#     id = Column(Integer, primary_key=True, index=True)
-#     name = Column(String)
-#     description = Column(String)
-#     semesters = Column(Integer)
-#     credits = Column(Integer)
-#     faculty_id = Column(Integer, ForeignKey('faculties.id'))
 @router.post(
     "/create-career",
     response_class=HTMLResponse,

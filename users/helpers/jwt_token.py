@@ -62,7 +62,7 @@ def get_user_information_from_token(request: Request) -> UserDict:
             request.session["error_message"] = "Invalid token."
 
             raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
+                status_code=status.HTTP_303_SEE_OTHER,
                 detail="Invalid token.",
                 headers={"Location": "/users/log-in"},
             )
@@ -71,7 +71,7 @@ def get_user_information_from_token(request: Request) -> UserDict:
         request.session["error_message"] = "Invalid token."
 
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_303_SEE_OTHER,
             detail="Invalid token.",
             headers={"Location": "/users/log-in"},
         )

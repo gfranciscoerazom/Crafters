@@ -1,0 +1,45 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<div class="container card p-0">
+    <!-- Card header -->
+    <h1 class="card-header text-center">Create skill</h1>
+
+    <!-- Card body -->
+    <div class="card-body p3">
+        {% if message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation" novalidate>
+            <!-- Skill name -->
+            <div class="form-floating mt-3">
+                <input type="text" class="form-control" name="name" id="floatingSkillName" placeholder="Skill name"
+                    aria-describedby="helpBlockSkillName" required>
+                <label for="floatingSkillName" class="px-3">
+                    Skill Name
+                </label>
+                <span class="form-text" id="helpBlockSkillName">
+                    Enter the name of the skill
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter the name of the skill
+                </span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-3">Create</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

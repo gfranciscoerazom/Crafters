@@ -130,6 +130,18 @@
                 </span>
             </div>
 
+            <!-- Skills -->
+            <h4 class="mt-5">
+                Select the skills of the user:
+            </h4>
+            {% for skill in skills %}
+            <input type="checkbox" class="btn-check" name="skill" value="{{ skill.id }}" id="btn-check-{{ skill.id }}"
+                autocomplete="off">
+            <label class="btn mb-1" for="btn-check-{{ skill.id }}">{{ skill.name }}</label>
+            {% endfor %}
+
+            <br />
+
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary mt-3">Create</button>
         </form>

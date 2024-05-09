@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Form, HTTPException, Request, status
+from fastapi import APIRouter, Form, Request, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from db.db_connection import db_dependency
@@ -166,6 +166,28 @@ def create_user_post(
             "role": user["role"],
         }
     )
+
+
+# region delete users
+@router.get(
+    "/delete-user/{user_id}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Delete a user.",
+)
+def delete_user(request: Request, user: user_dependency, db: db_dependency, user_id: int):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    if not db_user:
+        return RedirectResponse("/admin/show-users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db.delete(db_user)
+    db.commit()
+
+    return RedirectResponse("/admin/show-users", status_code=status.HTTP_303_SEE_OTHER)
 
 
 # region add a user to a career

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from db.db_connection import db_dependency
-from db.schema import Career, Faculty, Skill, User, UserSkill
+from db.schema import Career, Faculty, Skill, User, UserCareer, UserSkill
 from users.helpers.jwt_token import user_dependency
 from users.helpers.password_encryption import hash_password
 
@@ -134,6 +134,59 @@ def create_user_post(
     for skill_id in skill:
         db.add(UserSkill(user_id=new_user.id, skill_id=skill_id))
 
+    db.commit()
+
+    return templates.TemplateResponse(
+        "admin/index.html",
+        {
+            "request": request,
+            "role": user["role"],
+        }
+    )
+
+
+# region add a user to a career
+@router.get(
+    "/add-user-to-career",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the page to add a user to a career.",
+)
+def add_user_to_career(request: Request, user: user_dependency, db: db_dependency):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    all_users: list[User] = db.query(User).all()
+    all_careers: list[Career] = db.query(Career).all()
+
+    return templates.TemplateResponse(
+        "admin/users/add_to_career.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "users": all_users,
+            "careers": all_careers,
+        }
+    )
+
+
+@router.post(
+    "/add-user-to-career",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Add a user to a career.",
+)
+def add_user_to_career_post(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+    user_id: Annotated[int, Form(...)],
+    career_id: Annotated[int, Form(...)],
+):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db.add(UserCareer(user_id=user_id, career_id=career_id, status="pursuing"))
     db.commit()
 
     return templates.TemplateResponse(

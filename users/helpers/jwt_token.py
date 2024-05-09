@@ -94,7 +94,7 @@ def set_user_token_cookie(user: User, path: str):
     """
     token = create_access_token(
         user.to_UserDict(),
-        timedelta(minutes=30)
+        timedelta(minutes=120)
     )
 
     response = RedirectResponse(path, status_code=status.HTTP_302_FOUND)

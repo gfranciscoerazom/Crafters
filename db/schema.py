@@ -118,7 +118,7 @@ class UserCareer(Base):
     status = Column(String)
 
 
-class Career(Base):
+class Career(Base):  # ✅
     """
     Represents a career that a user can take.
 

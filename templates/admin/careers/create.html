@@ -1,0 +1,122 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<div class="container card p-0">
+    <!-- Card header -->
+    <h1 class="card-header text-center">Create career</h1>
+
+    <!-- Card body -->
+    <div class="card-body p3">
+        {% if message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation" novalidate>
+            <!-- Name -->
+            <div class="form-floating mt-3">
+                <input type="text" class="form-control" name="name" id="floatingCareerName" placeholder="Career name"
+                    aria-describedby="helpBlockCareerName" required>
+                <label for="floatingCareerName" class="px-3">
+                    Career Name
+                </label>
+                <span class="form-text" id="helpBlockCareerName">
+                    Enter the name of the career
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter the name of the career
+                </span>
+            </div>
+
+            <!-- Description -->
+            <div class="form-floating mt-3">
+                <textarea class="form-control" name="description" id="floatingCareerDescription"
+                    placeholder="Career description" aria-describedby="helpBlockCareerDescription" required></textarea>
+                <label for="floatingCareerDescription" class="px-3">
+                    Career Description
+                </label>
+                <span class="form-text" id="helpBlockCareerDescription">
+                    Enter the description of the career
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter the description of the career
+                </span>
+            </div>
+
+            <!-- Semesters -->
+            <div class="form-floating mt-3">
+                <input type="number" class="form-control" name="semesters" id="floatingCareerSemesters"
+                    placeholder="Number of semesters" aria-describedby="helpBlockCareerSemesters" required>
+                <label for="floatingCareerSemesters" class="px-3">
+                    Number of Semesters
+                </label>
+                <span class="form-text" id="helpBlockCareerSemesters">
+                    Enter the number of semesters of the career
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter the number of semesters of the career
+                </span>
+            </div>
+
+            <!-- Credits -->
+            <div class="form-floating mt-3">
+                <input type="number" class="form-control" name="credits" id="floatingCareerCredits"
+                    placeholder="Number of credits" aria-describedby="helpBlockCareerCredits" required>
+                <label for="floatingCareerCredits" class="px-3">
+                    Number of Credits
+                </label>
+                <span class="form-text" id="helpBlockCareerCredits">
+                    Enter the number of credits of the career
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter the number of credits of the career
+                </span>
+            </div>
+
+            <!-- Faculties -->
+            <div class="form-floating mt-3">
+                <select class="form-select" name="faculty_id" id="floatingCareerFaculty"
+                    aria-describedby="helpBlockCareerFaculty" required>
+                    <option value="" selected disabled>Select a faculty</option>
+                    {% for faculty in faculties %}
+                    <option value="{{ faculty.id }}">{{ faculty.name }}</option>
+                    {% endfor %}
+                </select>
+                <label for="floatingCareerFaculty" class="px-3">
+                    Faculty
+                </label>
+                <span class="form-text" id="helpBlockCareerFaculty">
+                    Select a faculty
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please select a faculty
+                </span>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-3">Create</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from db.db_connection import db_dependency
-from db.schema import Faculty, Skill, User
+from db.schema import Career, Faculty, Skill, User
 from users.helpers.jwt_token import user_dependency
 from users.helpers.password_encryption import hash_password
 
@@ -253,6 +253,132 @@ def create_faculty_post(
     new_faculty = Faculty(name=name)
 
     db.add(new_faculty)
+    db.commit()
+
+    return templates.TemplateResponse(
+        "admin/index.html",
+        {
+            "request": request,
+            "role": user["role"],
+        }
+    )
+
+
+# region create career
+@router.get(
+    "/create-career",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the page to create a new career.",
+)
+def create_career(request: Request, user: user_dependency, db: db_dependency):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    all_faculties: list[Faculty] = db.query(Faculty).all()
+
+    return templates.TemplateResponse(
+        "admin/careers/create.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "faculties": all_faculties,
+        }
+    )
+
+
+# class Career(Base):
+#     """
+#     Represents a career that a user can take.
+
+#     Attributes:
+#         id (int): The unique identifier for the career.
+#         name (str): The name of the career.
+#         description (str): The description of the career.
+#         semesters (int): The number of semesters of the career.
+#         credits (int): The number of credits of the career.
+#         faculty_id (int): The unique identifier for the faculty.
+#     """
+
+#     __tablename__ = 'careers'
+
+#     id = Column(Integer, primary_key=True, index=True)
+#     name = Column(String)
+#     description = Column(String)
+#     semesters = Column(Integer)
+#     credits = Column(Integer)
+#     faculty_id = Column(Integer, ForeignKey('faculties.id'))
+@router.post(
+    "/create-career",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Create a new career.",
+)
+def create_career_post(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+    name: Annotated[str, Form(...)],
+    description: Annotated[str, Form(...)],
+    semesters: Annotated[int, Form(...)],
+    credits: Annotated[int, Form(...)],
+    faculty_id: Annotated[int, Form(...)],
+):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    name = name.strip()
+    description = description.strip()
+
+    if not name:
+        return templates.TemplateResponse(
+            "admin/careers/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The name is required.",
+            }
+        )
+
+    if not description:
+        return templates.TemplateResponse(
+            "admin/careers/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The description is required.",
+            }
+        )
+
+    if semesters < 1:
+        return templates.TemplateResponse(
+            "admin/careers/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The number of semesters must be greater than 0.",
+            }
+        )
+
+    if credits < 1:
+        return templates.TemplateResponse(
+            "admin/careers/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The number of credits must be greater than 0.",
+            }
+        )
+
+    new_career = Career(
+        name=name,
+        description=description,
+        semesters=semesters,
+        credits=credits,
+        faculty_id=faculty_id,
+    )
+
+    db.add(new_career)
     db.commit()
 
     return templates.TemplateResponse(

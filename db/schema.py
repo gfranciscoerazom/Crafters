@@ -12,7 +12,7 @@ class UserDict(TypedDict):
     role: str
 
 
-class User(Base):
+class User(Base):  # ✅
     """
     Represents a user in the system.
 
@@ -48,7 +48,7 @@ class User(Base):
         }
 
 
-class Skill(Base):
+class Skill(Base):  # ✅
     """
     Represents a skill that a user can have.
 
@@ -141,7 +141,7 @@ class Career(Base):
     faculty_id = Column(Integer, ForeignKey('faculties.id'))
 
 
-class Faculty(Base):
+class Faculty(Base):  # ✅
     """
     Represents a faculty that a career can belong to.
 

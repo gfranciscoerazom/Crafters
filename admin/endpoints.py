@@ -3,7 +3,7 @@ from fastapi import APIRouter, Form, HTTPException, Request, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse
 from db.db_connection import db_dependency
-from db.schema import Skill, User
+from db.schema import Faculty, Skill, User
 from users.helpers.jwt_token import user_dependency
 from users.helpers.password_encryption import hash_password
 
@@ -192,6 +192,67 @@ def create_skill_post(
     new_skill = Skill(name=name)
 
     db.add(new_skill)
+    db.commit()
+
+    return templates.TemplateResponse(
+        "admin/index.html",
+        {
+            "request": request,
+            "role": user["role"],
+        }
+    )
+
+
+# region create faculty
+@router.get(
+    "/create-faculty",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the page to create a new faculty.",
+)
+def create_faculty(request: Request, user: user_dependency):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    return templates.TemplateResponse(
+        "admin/faculties/create.html",
+        {
+            "request": request,
+            "role": user["role"],
+        }
+    )
+
+
+@router.post(
+    "/create-faculty",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Create a new faculty.",
+)
+def create_faculty_post(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+    name: Annotated[str, Form(...)],
+):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    name = name.strip()
+
+    if not name:
+        return templates.TemplateResponse(
+            "admin/faculties/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The name is required.",
+            }
+        )
+
+    new_faculty = Faculty(name=name)
+
+    db.add(new_faculty)
     db.commit()
 
     return templates.TemplateResponse(

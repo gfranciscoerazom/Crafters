@@ -16,6 +16,29 @@ router = APIRouter(
 templates = Jinja2Templates(directory="templates")
 
 
+# region show all users
+@router.get(
+    "/show-users",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve all the users.",
+)
+def show_users(request: Request, user: user_dependency, db: db_dependency):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    all_users: list[User] = db.query(User).all()
+
+    return templates.TemplateResponse(
+        "admin/users/show.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "users": all_users,
+        }
+    )
+
+
 # region create users
 @router.get("/", response_class=HTMLResponse)
 def welcome_admin(

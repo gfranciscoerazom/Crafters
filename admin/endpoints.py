@@ -243,6 +243,39 @@ def add_user_to_career_post(
     )
 
 
+# region user details
+@router.get(
+    "/user-details/{user_id}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the details of a user.",
+)
+def user_details(request: Request, user: user_dependency, db: db_dependency, user_id: int):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    if not db_user:
+        return RedirectResponse("/admin/show-users", status_code=status.HTTP_303_SEE_OTHER)
+
+    user_skills = db.query(UserSkill, Skill).join(
+        Skill).filter(UserSkill.user_id == user_id).all()
+    user_careers = db.query(UserCareer, Career).join(
+        Career).filter(UserCareer.user_id == user_id).all()
+
+    return templates.TemplateResponse(
+        "admin/users/details.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "user": db_user,
+            "skills": user_skills,
+            "careers": user_careers,
+        }
+    )
+
+
 # region create skills
 @router.get(
     "/create-skill",

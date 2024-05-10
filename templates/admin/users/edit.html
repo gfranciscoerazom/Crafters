@@ -1,0 +1,179 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<div class="container card p-0">
+    <!-- Card header -->
+    <h1 class="card-header text-center">
+        Edit {{ user.first_name }} {{ user.last_name }}
+    </h1>
+
+    <!-- Card body -->
+    <div class="card-body p3">
+        {% if message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation" novalidate>
+            <div class="row g-3">
+                <!-- First Name -->
+                <div class="col form-floating">
+                    <input type="text" class="form-control" name="first_name" id="floatingFirstName"
+                        placeholder="Your first name" aria-describedby="helpBlockFirstName" required
+                        value="{{ user.first_name }}">
+                    <label for="floatingFirstName" class="mx-2">
+                        First Name
+                    </label>
+                    <span class="form-text" id="helpBlockFirstName">
+                        Enter your first name
+                    </span>
+                    <span class="valid-feedback">
+                        Looks good!
+                    </span>
+                    <span class="invalid-feedback">
+                        Please enter your first name
+                    </span>
+                </div>
+
+                <!-- Last Name -->
+                <div class="col form-floating">
+                    <input type="text" class="form-control" name="last_name" id="floatingLastName"
+                        placeholder="Your last name" aria-describedby="helpBlockLastName" required
+                        value="{{ user.last_name }}">
+                    <label for="floatingLastName" class="mx-2">
+                        Last Name
+                    </label>
+                    <span class="form-text" id="helpBlockLastName">
+                        Enter your last name
+                    </span>
+                    <span class="valid-feedback">
+                        Looks good!
+                    </span>
+                    <span class="invalid-feedback">
+                        Please enter your last name
+                    </span>
+                </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-floating mt-3">
+                <input type="email" class="form-control" name="email" id="floatingEmail" placeholder="Your email"
+                    aria-describedby="helpBlockEmail" required value="{{ user.email }}">
+                <label for="floatingEmail" class="px-3">
+                    Email
+                </label>
+                <span class="form-text" id="helpBlockEmail">
+                    Enter your email
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please enter your email address
+                </span>
+            </div>
+
+            <!-- Role -->
+            <div class="form-floating mt-3">
+                <select class="form-select" name="role" id="floatingRole" aria-describedby="helpBlockRole" required>
+                    <option value="admin" {% if user.role=='admin' %}selected{% endif %}>Admin</option>
+                    <option value="user" {% if user.role=='user' %}selected{% endif %}>User</option>
+                </select>
+                <label for="floatingRole" class="px-3">
+                    Role
+                </label>
+                <span class="form-text" id="helpBlockRole">
+                    Select a role (Admin to have full access, User to have limited access)
+                </span>
+                <span class="valid-feedback">
+                    Looks good!
+                </span>
+                <span class="invalid-feedback">
+                    Please select a role
+                </span>
+            </div>
+
+            <!-- Is Active -->
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" name="is_active" id="flexCheckDefault" {% if
+                    user.is_active %}checked{% endif %}>
+                <label class="form-check-label" for="flexCheckDefault">
+                    Is Active
+                </label>
+            </div>
+
+            <!-- Skills -->
+            <h4 class="mt-5">
+                Select the skills of the user:
+            </h4>
+            {% for skill in skills %}
+            <input type="checkbox" class="btn-check" name="skill" value="{{ skill.id }}" id="btn-check-{{ skill.id }}"
+                autocomplete="off" {% if skill.id in user_skills %}checked{% endif %}>
+            <label class="btn mb-1" for="btn-check-{{ skill.id }}">{{ skill.name }}</label>
+            {% endfor %}
+
+            <br />
+
+            <!-- Careers -->
+            <h4 class="mt-5">
+                Careers
+            </h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Career</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for career in user_careers %}
+                    <tr>
+                        <td>
+                            {{ career[1].name }}
+                            <input type="hidden" name="career_id" value="{{ career[1].id }}">
+                        </td>
+                        <td>
+                            <select class="form-select" name="career_status" id="floatingCareerStatus{{ career[0].id }}"
+                                aria-describedby="helpBlockCareerStatus" required>
+                                <option value="pursuing" {% if career[0].status=='pursuing' %}selected{% endif %}>
+                                    Pursuing
+                                </option>
+                                <option value="graduated" {% if career[0].status=='graduated' %}selected{% endif %}>
+                                    Graduated
+                                </option>
+                                <option value="expelled" {% if career[0].status=='expelled' %}selected{% endif %}>
+                                    Expelled
+                                </option>
+                                <option value="resigned" {% if career[0].status=='resigned' %}selected{% endif %}>
+                                    Resigned
+                                </option>
+                            </select>
+                            <span class="form-text" id="helpBlockCareerStatus">
+                                Select the status of the career
+                            </span>
+                            <span class="valid-feedback">
+                                Looks good!
+                            </span>
+                            <span class="invalid-feedback">
+                                Please select the status of the career
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-3">
+                Update
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

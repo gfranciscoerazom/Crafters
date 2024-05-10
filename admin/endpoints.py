@@ -276,6 +276,117 @@ def user_details(request: Request, user: user_dependency, db: db_dependency, use
     )
 
 
+# region edit users
+@router.get(
+    "/edit-user/{user_id}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the page to edit a user.",
+)
+def edit_user(request: Request, user: user_dependency, db: db_dependency, user_id: int):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    if not db_user:
+        return RedirectResponse("/admin/show-users", status_code=status.HTTP_303_SEE_OTHER)
+
+    all_skills: list[Skill] = db.query(Skill).all()
+    user_skills: list[UserSkill] = db.query(UserSkill).filter(
+        UserSkill.user_id == user_id).all()
+    user_skills = [skill.skill_id for skill in user_skills]
+    user_careers = db.query(UserCareer, Career).join(
+        Career).filter(UserCareer.user_id == user_id).all()
+
+    return templates.TemplateResponse(
+        "admin/users/edit.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "user": db_user,
+            "skills": all_skills,
+            "user_skills": user_skills,
+            "user_careers": user_careers,
+        }
+    )
+
+
+@router.post(
+    "/edit-user/{user_id}",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Edit a user.",
+)
+def edit_user_post(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+    user_id: int,
+    first_name: Annotated[str, Form(...)],
+    last_name: Annotated[str, Form(...)],
+    email: Annotated[str, Form(...)],
+    role: Annotated[str, Form(...)],
+    skill: Annotated[list, Form(...)],
+    career_id: Annotated[list[int], Form(...)],
+    career_status: Annotated[list, Form(...)],
+    is_active: Annotated[bool, Form(...)] = False,
+):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    db_user = db.query(User).filter(User.id == user_id).first()
+
+    if not db_user:
+        return RedirectResponse("/admin/show-users", status_code=status.HTTP_303_SEE_OTHER)
+
+    # Valida que el email tenga un formato válido
+    if "@" not in email or " " in email or email.count("@") > 1 or email.split("@")[1].count(".") == 0:
+        return templates.TemplateResponse(
+            "admin/users/edit.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "user": db_user,
+                "message": "The email is not valid.",
+            }
+        )
+
+    db_user.first_name = first_name
+    db_user.last_name = last_name
+    db_user.email = email
+    db_user.role = role
+    db_user.is_active = is_active
+
+    db.commit()
+
+    db.query(UserSkill).filter(UserSkill.user_id == user_id).delete()
+
+    for skill_id in skill:
+        db.add(UserSkill(user_id=user_id, skill_id=skill_id))
+
+    db.commit()
+
+    db.query(UserCareer).filter(UserCareer.user_id == user_id).delete()
+    users_careers: list[UserCareer] = [
+        UserCareer(
+            user_id=user_id,
+            career_id=career_id,
+            status=status
+        ) for career_id, status in zip(career_id, career_status)
+    ]
+    db.add_all(users_careers)
+    db.commit()
+
+    return templates.TemplateResponse(
+        "admin/index.html",
+        {
+            "request": request,
+            "role": user["role"],
+        }
+    )
+
+
 # region create skills
 @router.get(
     "/create-skill",

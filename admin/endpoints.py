@@ -123,6 +123,19 @@ def create_user_post(
             }
         )
 
+    first_name = first_name.strip()
+    last_name = last_name.strip()
+
+    if not first_name:
+        return templates.TemplateResponse(
+            "admin/users/create.html",
+            {
+                "request": request,
+                "role": user["role"],
+                "message": "The first name is required.",
+            }
+        )
+
     if password != password_confirmation:
         return templates.TemplateResponse(
             "admin/users/create.html",

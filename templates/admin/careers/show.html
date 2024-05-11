@@ -1,0 +1,34 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Semesters</th>
+            <th scope="col">Credits</th>
+            <th scope="col">Faculty</th>
+            <th scope="col">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for career in careers %}
+        <tr>
+            <th scope="row">{{ career[0].id }}</th>
+            <td>{{ career[0].name }}</td>
+            <td>{{ career[0].description }}</td>
+            <td>{{ career[0].semesters }}</td>
+            <td>{{ career[0].credits }}</td>
+            <td>{{ career[1].name }}</td>
+            <td>
+                <!-- <a href="/admin/delete-career/{{ career.id }}" class="btn btn-danger">Delete</a>
+                <a href="/admin/career-details/{{ career.id }}" class="btn btn-primary">Details</a>
+                <a href="/admin/edit-career/{{ career.id }}" class="btn btn-primary">Edit</a> -->
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

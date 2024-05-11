@@ -612,3 +612,27 @@ def create_career_post(
             "role": user["role"],
         }
     )
+
+
+# region show all careers
+@router.get(
+    "/show-careers",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve all the careers.",
+)
+def show_careers(request: Request, user: user_dependency, db: db_dependency):
+    if user["role"] != "admin":
+        return RedirectResponse("/users", status_code=status.HTTP_303_SEE_OTHER)
+
+    all_careers: list[Career, Faculty] = db.query(
+        Career, Faculty).join(Faculty).all()
+
+    return templates.TemplateResponse(
+        "admin/careers/show.html",
+        {
+            "request": request,
+            "role": user["role"],
+            "careers": all_careers,
+        }
+    )

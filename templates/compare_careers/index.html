@@ -1,0 +1,78 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<div class="container card p-0">
+    <!-- Card header -->
+    <h1 class="card-header text-center">Select careers</h1>
+
+    <!-- Card body -->
+    <div class="card-body p3">
+        {% if message %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <form method="post" class="needs-validation" novalidate>
+            <!-- Select careers -->
+            <div class="row g-3">
+                <!-- First career -->
+                <div class="col form-floating mt-3">
+                    <select class="form-select" name="career_id_1" id="floatingCareer1"
+                        aria-describedby="helpBlockCareer1" required>
+                        <option value="" selected disabled>Select a career</option>
+                        {% for career in careers %}
+                        <option value="{{ career.id }}">{{ career.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="floatingCareer1" class="px-3">
+                        First career
+                    </label>
+                    <span class="form-text" id="helpBlockCareer1">
+                        Select the first career
+                    </span>
+                    <span class="valid-feedback">
+                        Looks good!
+                    </span>
+                    <span class="invalid-feedback">
+                        Please select the first career
+                    </span>
+                </div>
+
+                <!-- Second career -->
+                <div class="col form-floating mt-3">
+                    <select class="form-select" name="career_id_2" id="floatingCareer2"
+                        aria-describedby="helpBlockCareer2" required>
+                        <option value="" selected disabled>Select a career</option>
+                        {% for career in careers %}
+                        <option value="{{ career.id }}">{{ career.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="floatingCareer2" class="px-3">
+                        Second career
+                    </label>
+                    <span class="form-text" id="helpBlockCareer2">
+                        Select the second career
+                    </span>
+                    <span class="valid-feedback">
+                        Looks good!
+                    </span>
+                    <span class="invalid-feedback">
+                        Please select the second career
+                    </span>
+                </div>
+            </div>
+
+            <br />
+
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary mt-3">Compare careers</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

@@ -109,7 +109,7 @@ class UserCareer(Base):
     Attributes:
         user_id (int): The unique identifier for the user.
         career_id (int): The unique identifier for the career.
-        status (str): The status of the user in the career.
+        status (str): The status of the user in the career (cursando, graduado, expulsado, dimitido).
     """
 
     __tablename__ = 'users_careers'

@@ -5,13 +5,15 @@ from fastapi import FastAPI  # Import the FastAPI class
 from db.db_connection import SessionLocal, engine
 import db.schema as schema  # Import the schema for the database
 from db.schema import User  # Import the User class from the schema
+from starlette.middleware.sessions import SessionMiddleware
+from users.helpers.password_encryption import hash_password
+
 # Import the endpoints for the users
 from users import endpoints as users_endpoints
 # Import the endpoints for the admin
 from admin import endpoints as admin_endpoints
-from starlette.middleware.sessions import SessionMiddleware
-
-from users.helpers.password_encryption import hash_password
+# Import the endpoints to compare careers
+from compare_careers import endpoints as compare_careers_endpoints
 
 app = FastAPI()  # Create an instance of the FastAPI class
 
@@ -28,6 +30,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Include the routers from the endpoints
 app.include_router(users_endpoints.router)
 app.include_router(admin_endpoints.router)
+app.include_router(compare_careers_endpoints.router)
 
 
 db = SessionLocal()

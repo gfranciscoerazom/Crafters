@@ -4,11 +4,11 @@ Sitio web que permite a los estudiantes comparar diferentes programas académico
 
 ## Descripción
 
-El proyecto “Crafters” es una plataforma web interactiva diseñada para estudiantes, personal académico y futuros candidatos interesados en los programas ofrecidos por la universidad. Esta herramienta permitirá a los usuarios comparar de manera eficiente y efectiva diversos aspectos de los programas académicos, como la duración, los requisitos de crédito, las tasas de graduación y las oportunidades laborales posteriores a la graduación. El objetivo es proporcionar una visión clara y concisa que ayude en la toma de decisiones informadas respecto a la elección de programas académicos.
+El proyecto “Crafters” es una plataforma web interactiva diseñada para estudiantes, personal académico y futuros candidatos interesados en los programas ofrecidos por la universidad. Esta herramienta permitirá a los usuarios comparar de manera eficiente y efectiva diversos aspectos de los programas académicos, como la duración, los requisitos de crédito, las tasas de graduación y las oportunidades laborales posteriores a la graduación. Además de ayudarle al estudiante a escoger una carrera según sus habilidades. El objetivo es proporcionar una visión clara y concisa que ayude en la toma de decisiones informadas respecto a la elección de programas académicos.
 
 ## Explicación
 
-El núcleo del proyecto se basa en una base de datos robusta que almacena información detallada sobre cada programa académico. La interfaz de usuario será intuitiva, ofreciendo filtros y opciones de comparación personalizables. Los usuarios podrán seleccionar programas para comparar y visualizar los datos en tablas comparativas dinámicas.
+El núcleo del proyecto se basa en una base de datos robusta que almacena información detallada sobre cada programa académico. La interfaz de usuario será intuitiva, ofreciendo filtros y opciones de comparación personalizables. Los usuarios podrán seleccionar programas para comparar y visualizar los datos en tablas comparativas dinámicas. Y también podrán visualizar que tan bien se ajusta un programa a sus habilidades.
 
 ## Alcance
 
@@ -17,34 +17,12 @@ El alcance principal del proyecto incluye:
 * **Desarrollo de la Base de Datos**: Crear y mantener una base de datos actualizada con información de todos los programas académicos.
 * **Interfaz de Usuario**: Diseñar una interfaz amigable y accesible para todos los dispositivos.
 * **Sistema de Comparación**: Implementar un sistema que permita la comparación efectiva entre programas seleccionados por el usuario.
+* **Sistema de Recomendación**: Desarrollar un sistema que recomiende programas académicos basados en las habilidades de los usuario.
 * **Feedback de Usuarios**: Incorporar un mecanismo para que los usuarios puedan dejar comentarios y valoraciones sobre los programas.
 
 ## Diagramas
 
 ### Diagrama Entidad Relación
-
-#### Entidades Principales
-
-1. **Programa Académico**
-   * Atributos: ID del programa, nombre, descripción, duración, créditos necesarios, departamento.
-2. **Departamento**
-   * Atributos: ID del departamento, nombre del departamento, director, contacto.
-3. **Curso**
-   * Atributos: ID del curso, nombre del curso, descripción, créditos, ID del programa.
-4. **Estudiante**
-   * Atributos: ID del estudiante, nombre, apellido, ID del programa, año de ingreso.
-5. **Profesor**
-   * Atributos: ID del profesor, nombre, apellido, especialidad, ID del departamento.
-
-#### Relaciones
-
-* **Programa Académico** - **Departamento**: Un departamento puede ofrecer varios programas académicos.
-* **Programa Académico** - **Curso**: Un programa académico incluye varios cursos.
-* **Curso** - **Profesor**: Un profesor puede enseñar varios cursos.
-* **Estudiante** - **Programa Académico**: Un estudiante está inscrito en un programa académico.
-* **Estudiante** - **Curso**: Un estudiante toma varios cursos.
-
-#### Gráfico
 
 <iframe width="560" height="315" src='https://dbdiagram.io/e/6615eb8703593b6b619dfd02/6627d01003593b6b61c2bc3d'> </iframe>
 

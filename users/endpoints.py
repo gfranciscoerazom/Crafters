@@ -5,7 +5,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 # Import the APIRouter class to create a router
 from fastapi.templating import Jinja2Templates
 from db.db_connection import db_dependency
-from db.schema import User
+from db.schema import Skill, User, UserSkill
 from users.helpers.authenticate_user import authenticate_user
 from users.helpers.jwt_token import set_user_token_cookie, user_dependency
 from users.helpers.password_encryption import hash_password
@@ -50,7 +50,7 @@ def read_users(
     status_code=status.HTTP_200_OK,
     description="Retrieve the sign-up page.",
 )
-def sign_up(request: Request):
+def sign_up(request: Request, db: db_dependency):
     """
     Retrieve the sign-up page.
 
@@ -60,9 +60,15 @@ def sign_up(request: Request):
     Returns:
         TemplateResponse: The rendered sign-up.html template with the request object.
     """
-    return templates.TemplateResponse("users/sign-up.html", {
-        "request": request,
-    })
+    all_skills: list[Skill] = db.query(Skill).all()
+
+    return templates.TemplateResponse(
+        "users/sign-up.html",
+        {
+            "request": request,
+            "skills": all_skills,
+        }
+    )
 
 
 @router.post(
@@ -79,6 +85,7 @@ def create_user(
     email: Annotated[str, Form(...)],
     password: Annotated[str, Form(...)],
     password_confirmation: Annotated[str, Form(...)],
+    skill: Annotated[list, Form(...)],
 ):
     """
     Create a new user.
@@ -118,6 +125,11 @@ def create_user(
     )
 
     db.add(new_user)
+    db.commit()
+
+    for skill_id in skill:
+        db.add(UserSkill(user_id=new_user.id, skill_id=skill_id))
+
     db.commit()
 
     return set_user_token_cookie(new_user, "/users/")

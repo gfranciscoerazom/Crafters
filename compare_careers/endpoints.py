@@ -32,23 +32,6 @@ def get_compare_careers(request: Request, db: db_dependency):
     )
 
 
-# @router.post(
-#     "/",
-#     response_class=HTMLResponse,
-#     status_code=status.HTTP_200_OK,
-#     description="Get the information of a career."
-# )
-# def get_career(request: Request, db: db_dependency, career_id: int):
-#     career = db.query(Career).filter(Career.id == career_id).first()
-#     return templates.TemplateResponse(
-#         "/compare_careers/career.html",
-#         {
-#             "request": request,
-#             "career": career
-#         }
-#     )
-
-
 @router.post(
     "/",
     response_class=HTMLResponse,

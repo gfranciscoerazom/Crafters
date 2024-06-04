@@ -39,7 +39,6 @@ def show_users(request: Request, user: user_dependency, db: db_dependency):
     )
 
 
-# region create users
 @router.get("/", response_class=HTMLResponse)
 def welcome_admin(
     request: Request,
@@ -57,6 +56,7 @@ def welcome_admin(
     )
 
 
+# region create users
 @router.get(
     "/create-user",
     response_class=HTMLResponse,

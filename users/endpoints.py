@@ -5,10 +5,11 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 # Import the APIRouter class to create a router
 from fastapi.templating import Jinja2Templates
 from db.db_connection import db_dependency
-from db.schema import Skill, User, UserSkill
+from db.schema import Career, Skill, User, UserCareer, UserSkill
 from users.helpers.authenticate_user import authenticate_user
 from users.helpers.jwt_token import set_user_token_cookie, user_dependency
 from users.helpers.password_encryption import hash_password
+from sqlalchemy import desc, func
 
 # region setup
 # Create the router for the users
@@ -192,9 +193,8 @@ def log_in_user(request: Request, db: db_dependency, email: Annotated[str, Form(
 
     return set_user_token_cookie(user, "/users/")
 
+
 # region log-out
-
-
 @router.get(
     "/log-out",
     response_class=RedirectResponse,
@@ -214,3 +214,186 @@ def log_out():
     )
     response.delete_cookie("access_token")
     return response
+
+
+# region compare skills
+@router.get(
+    "/compare-skills",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the compare skills page.",
+)
+def compare_skills(request: Request, user: user_dependency, db: db_dependency):
+    """
+    Retrieve the compare skills page.
+
+    Parameters:
+        request (Request): The incoming request object.
+
+    Returns:
+        TemplateResponse: The rendered compare-skills.html template with the request object.
+    """
+    user_skills = db.query(Skill).join(UserSkill).filter(
+        UserSkill.user_id == user["id"]).all()
+
+    all_careers = db.query(Career).all()
+
+    return templates.TemplateResponse(
+        "users/compare-skills.html",
+        {
+            "request": request,
+            "user_skills": user_skills,
+            "user": user,
+            "careers": all_careers,
+        }
+    )
+
+
+def get_element(list, index):
+    try:
+        return list[index]
+    except IndexError:
+        return 0
+
+
+def balance_skills(skills_of_students):
+    balanced_skills_of_students = []
+    for i in range(10):
+        skill = get_element(skills_of_students, i)
+
+        if skill == 0:
+            break
+
+        skill = list(skill)
+
+        if i < 5:
+            skill[2] *= 5 - i
+        balanced_skills_of_students.append(skill)
+    return balanced_skills_of_students
+
+
+@router.post(
+    "/compare-skills",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Compare two skills.",
+)
+def compare_skills(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+    career_id: Annotated[int, Form(...)],
+):
+    user_skills = db.query(Skill).join(UserSkill).filter(
+        UserSkill.user_id == user["id"]).all()
+
+    all_careers = db.query(Career).all()
+
+    skills_of_pursuing_students = db.query(
+        Skill.id,
+        Skill.name,
+        func.count(Skill.id).label("count")
+    ).join(UserSkill).join(User).join(UserCareer).filter(
+        UserCareer.career_id == career_id, UserCareer.status == "cursando").group_by(Skill.id).order_by(desc("count")).all()
+
+    skills_of_graduated_students = db.query(
+        Skill.id,
+        Skill.name,
+        func.count(Skill.id).label("count")
+    ).join(UserSkill).join(User).join(UserCareer).filter(
+        UserCareer.career_id == career_id, UserCareer.status == "graduado").group_by(Skill.id).order_by(desc("count")).all()
+
+    skills_of_expelled_students = db.query(
+        Skill.id,
+        Skill.name,
+        func.count(Skill.id).label("count")
+    ).join(UserSkill).join(User).join(UserCareer).filter(
+        UserCareer.career_id == career_id, UserCareer.status == "expulsado").group_by(Skill.id).order_by(desc("count")).all()
+
+    skills_of_resigned_students = db.query(
+        Skill.id,
+        Skill.name,
+        func.count(Skill.id).label("count")
+    ).join(UserSkill).join(User).join(UserCareer).filter(
+        UserCareer.career_id == career_id, UserCareer.status == "dimitido").group_by(Skill.id).order_by(desc("count")).all()
+
+    # Balance de importancia de las habilidades
+    balanced_skills_of_pursuing_students = balance_skills(
+        skills_of_pursuing_students)
+
+    balanced_skills_of_graduated_students = balance_skills(
+        skills_of_graduated_students)
+
+    balanced_skills_of_expelled_students = balance_skills(
+        skills_of_expelled_students)
+
+    balanced_skills_of_resigned_students = balance_skills(
+        skills_of_resigned_students)
+
+    sum_of_pursuing_students = sum(
+        [skill[2] for skill in balanced_skills_of_pursuing_students])
+
+    sum_of_graduated_students = sum(
+        [skill[2] for skill in balanced_skills_of_graduated_students])
+
+    sum_of_expelled_students = sum(
+        [skill[2] for skill in balanced_skills_of_expelled_students])
+
+    sum_of_resigned_students = sum(
+        [skill[2] for skill in balanced_skills_of_resigned_students])
+
+    user_id_skills = [skill.id for skill in user_skills]
+
+    pursuing_user_skills = [
+        skill for skill in balanced_skills_of_pursuing_students if skill[0] in user_id_skills]
+
+    graduated_user_skills = [
+        skill for skill in balanced_skills_of_graduated_students if skill[0] in user_id_skills]
+
+    expelled_user_skills = [
+        skill for skill in balanced_skills_of_expelled_students if skill[0] in user_id_skills]
+
+    resigned_user_skills = [
+        skill for skill in balanced_skills_of_resigned_students if skill[0] in user_id_skills]
+
+    sum_of_pursuing_user_skills = sum(
+        [skill[2] for skill in pursuing_user_skills])
+
+    sum_of_graduated_user_skills = sum(
+        [skill[2] for skill in graduated_user_skills])
+
+    sum_of_expelled_user_skills = sum(
+        [skill[2] for skill in expelled_user_skills])
+
+    sum_of_resigned_user_skills = sum(
+        [skill[2] for skill in resigned_user_skills])
+
+    percentage_of_pursuing_user_skills = round(
+        (sum_of_pursuing_user_skills / sum_of_pursuing_students) * 100, 2)
+
+    percentage_of_graduated_user_skills = round(
+        (sum_of_graduated_user_skills / sum_of_graduated_students) * 100, 2)
+
+    percentage_of_expelled_user_skills = round(
+        (sum_of_expelled_user_skills / sum_of_expelled_students) * 100, 2)
+
+    percentage_of_resigned_user_skills = round(
+        (sum_of_resigned_user_skills / sum_of_resigned_students) * 100, 2)
+
+    return templates.TemplateResponse(
+        "users/compare-skills.html",
+        {
+            "request": request,
+            "user_skills": user_skills,
+            "user": user,
+            "careers": all_careers,
+            "skills_of_pursuing_students": skills_of_pursuing_students,
+            "skills_of_graduated_students": skills_of_graduated_students,
+            "skills_of_expelled_students": skills_of_expelled_students,
+            "skills_of_resigned_students": skills_of_resigned_students,
+            "percentage_of_pursuing_user_skills": percentage_of_pursuing_user_skills,
+            "percentage_of_graduated_user_skills": percentage_of_graduated_user_skills,
+            "percentage_of_expelled_user_skills": percentage_of_expelled_user_skills,
+            "percentage_of_resigned_user_skills": percentage_of_resigned_user_skills,
+        }
+    )

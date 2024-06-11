@@ -1,0 +1,168 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<!-- Create two columns the first one with the skills of the user (this column needs to be smaller) and the second one with the skills of the career -->
+<div class="container text-center">
+    <div class="row">
+        <div class="col-2 border-end">
+            <h3>
+                Your skills
+            </h3>
+            <hr>
+
+            {% for skill in user_skills %}
+            <p>{{ skill.name }}</p>
+            {% endfor %}
+        </div>
+        <div class="col-10">
+            <h3>
+                Career skills
+            </h3>
+            <hr>
+            <form method="post" class="needs-validation" novalidate>
+
+                <!-- Career select -->
+                <div class="form-floating">
+                    <select class="form-select" name="career_id" id="floatingCareer" aria-describedby="helpBlockCareer"
+                        required>
+                        <option value="" selected disabled>Select your career</option>
+                        {% for career in careers %}
+                        <option value="{{ career.id }}">{{ career.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="floatingCareer" class="px-3">
+                        Career
+                    </label>
+                    <span class="form-text" id="helpBlockCareer">
+                        Select your career
+                    </span>
+                    <span class="valid-feedback">
+                        Looks good!
+                    </span>
+                    <span class="invalid-feedback">
+                        Please select your career
+                    </span>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary mt-3">Explore!</button>
+            </form>
+            <hr>
+
+            <h2>Porcentaje de habilidades del usuario con referencia en los estudiantes que:</h2>
+            <div class="row">
+                <div class="col-sm-3">
+                    <h3>Están cursando la carrera</h3>
+                    <h4>
+                        {{ percentage_of_pursuing_user_skills }}%
+                    </h4>
+                </div>
+                <div class="col-sm-3">
+                    <h3>Se han graduado</h3>
+                    <h4>
+                        {{ percentage_of_graduated_user_skills }}%
+                    </h4>
+                </div>
+                <div class="col-sm-3">
+                    <h3>Fueron expulsados</h3>
+                    <h4>
+                        {{ percentage_of_expelled_user_skills }}%
+                    </h4>
+                </div>
+                <div class="col-sm-3">
+                    <h3>Renunciaron</h3>
+                    <h4>
+                        {{ percentage_of_resigned_user_skills }}%
+                    </h4>
+                </div>
+            </div>
+            <hr>
+
+            {% if skills_of_pursuing_students %}
+            <h4>Skills of students pursuing the career</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">SKILL</th>
+                        <th scope="col">COUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tuple in skills_of_pursuing_students %}
+                    <tr>
+                        <td>{{ tuple[1] }}</td>
+                        <td>{{ tuple[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if skills_of_graduated_students %}
+            <h4>Skills of graduated students</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">SKILL</th>
+                        <th scope="col">COUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tuple in skills_of_graduated_students %}
+                    <tr>
+                        <td>{{ tuple[1] }}</td>
+                        <td>{{ tuple[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if skills_of_expelled_students %}
+            <h4>Skills of expelled students</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">SKILL</th>
+                        <th scope="col">COUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tuple in skills_of_expelled_students %}
+                    <tr>
+                        <td>{{ tuple[1] }}</td>
+                        <td>{{ tuple[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+
+            {% if skills_of_resigned_students %}
+            <h4>Skills of resigned students</h4>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">SKILL</th>
+                        <th scope="col">COUNT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tuple in skills_of_resigned_students %}
+                    <tr>
+                        <td>{{ tuple[1] }}</td>
+                        <td>{{ tuple[2] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

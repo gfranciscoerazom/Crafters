@@ -1,0 +1,27 @@
+{% extends "/layout/base.html" %}
+
+{% block content %}
+<!-- Create two columns the first one with the skills of the user (this column needs to be smaller) and the second one with the skills of the career -->
+<h4>Affinity according to the skills of graduate students.</h4>
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th scope="col">CAREER</th>
+            <th scope="col">PERCENTAGE</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for career, percentage in zip_careers_percentage %}
+        <tr>
+            <td>{{ career }}</td>
+            <td>{{ percentage }}%</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/form-submission-validation.js"></script>
+{% endblock %}

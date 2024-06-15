@@ -397,3 +397,72 @@ def compare_skills(
             "percentage_of_resigned_user_skills": percentage_of_resigned_user_skills,
         }
     )
+
+
+@router.get(
+    "/suggest-career-by-skills-of-graduated-students",
+    response_class=HTMLResponse,
+    status_code=status.HTTP_200_OK,
+    description="Retrieve the percentage of affinity of the user with the skills of graduated students.",
+)
+def suggest_career_by_skills_of_graduated_students(
+    request: Request,
+    user: user_dependency,
+    db: db_dependency,
+):
+    user_skills = db.query(Skill).join(UserSkill).filter(
+        UserSkill.user_id == user["id"]).all()
+
+    all_careers = db.query(Career).all()
+
+    skills_of_graduated_students_of_all_careers = [
+        db.query(
+            Skill.id,
+            Skill.name,
+            func.count(Skill.id).label("count")
+        ).join(UserSkill).join(User).join(UserCareer).filter(
+            UserCareer.career_id == career.id, UserCareer.status == "graduado").group_by(Skill.id).order_by(desc("count")).all()
+        for career in all_careers
+    ]
+
+    # Balance de importancia de las habilidades
+    balanced_skills_of_graduated_students_of_all_careers = [
+        balance_skills(skills_of_graduated_students)
+        for skills_of_graduated_students in skills_of_graduated_students_of_all_careers
+    ]
+
+    sum_of_graduated_students_of_all_careers = [
+        sum([skill[2] for skill in balanced_skills_of_graduated_students])
+        for balanced_skills_of_graduated_students in balanced_skills_of_graduated_students_of_all_careers
+    ]
+
+    user_id_skills = [skill.id for skill in user_skills]
+
+    pursuing_user_skills_of_all_careers = [
+        [
+            skill for skill in balanced_skills_of_graduated_students if skill[0] in user_id_skills
+        ]
+        for balanced_skills_of_graduated_students in balanced_skills_of_graduated_students_of_all_careers
+    ]
+
+    sum_of_pursuing_user_skills_of_all_careers = [
+        sum([skill[2] for skill in pursuing_user_skills])
+        for pursuing_user_skills in pursuing_user_skills_of_all_careers
+    ]
+
+    percentage_of_pursuing_user_skills_of_all_careers = [
+        round((sum_of_pursuing_user_skills / sum_of_graduated_students) * 100, 2)
+        for sum_of_pursuing_user_skills, sum_of_graduated_students in zip(sum_of_pursuing_user_skills_of_all_careers, sum_of_graduated_students_of_all_careers)
+    ]
+
+    return templates.TemplateResponse(
+        "users/suggest-career-by-skills-of-graduated-students.html",
+        {
+            "request": request,
+            "user_skills": user_skills,
+            "user": user,
+            "careers": all_careers,
+            "percentage_of_pursuing_user_skills_of_all_careers": percentage_of_pursuing_user_skills_of_all_careers,
+            "zip_careers_percentage": sorted(zip(list(map(lambda career: career.name, all_careers)), percentage_of_pursuing_user_skills_of_all_careers), key=lambda x: x[1], reverse=True),
+        }
+    )

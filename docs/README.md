@@ -1,24 +1,23 @@
 # Crafters
 
-Sitio web que permite a los estudiantes comparar diferentes programas académicos ofrecidos por la universidad.
+Sitio web que permite a los estudiantes comparar diferentes programas académicos ofrecidos por la universidad además de una forma de comparar las habilidades que tiene el usuario con los estudiantes que han cursado el programa, que se han graduado, han sido expulsados y se retiraron de la carrera.
 
 ## Descripción
 
-El proyecto “Crafters” es una plataforma web interactiva diseñada para estudiantes, personal académico y futuros candidatos interesados en los programas ofrecidos por la universidad. Esta herramienta permitirá a los usuarios comparar de manera eficiente y efectiva diversos aspectos de los programas académicos, como la duración, los requisitos de crédito, las tasas de graduación y las oportunidades laborales posteriores a la graduación. Además de ayudarle al estudiante a escoger una carrera según sus habilidades. El objetivo es proporcionar una visión clara y concisa que ayude en la toma de decisiones informadas respecto a la elección de programas académicos.
+El proyecto “Crafters” es una plataforma web interactiva diseñada para estudiantes, personal académico y futuros candidatos interesados en los programas ofrecidos por la universidad. Esta herramienta permitirá a los usuarios comparar de manera eficiente y efectiva diversos aspectos de los programas académicos, como la duración, los requisitos de crédito, las tasas de graduación. Además de ayudarle al estudiante a escoger una carrera según sus habilidades. El objetivo es proporcionar una visión clara y concisa que ayude en la toma de decisiones informadas respecto a la elección de programas académicos.
 
 ## Explicación
 
-El núcleo del proyecto se basa en una base de datos robusta que almacena información detallada sobre cada programa académico. La interfaz de usuario será intuitiva, ofreciendo filtros y opciones de comparación personalizables. Los usuarios podrán seleccionar programas para comparar y visualizar los datos en tablas comparativas dinámicas. Y también podrán visualizar que tan bien se ajusta un programa a sus habilidades.
+El núcleo del proyecto se basa en una base de datos robusta que almacena información detallada sobre cada programa académico y las habilidades de los estudiantes. La interfaz de usuario será intuitiva, ofreciendo opciones de comparación tanto de carreras como de habilidades. Los usuarios podrán seleccionar programas para comparar y visualizar los datos en tablas comparativas. Y también podrán visualizar que tan bien se ajusta un programa a sus habilidades con respecto a las habilidades de otros estudiantes que cursaron, se graduaron, se retiraron o fueron expulsados de esa carrera.
 
 ## Alcance
 
 El alcance principal del proyecto incluye:
 
 * **Desarrollo de la Base de Datos**: Crear y mantener una base de datos actualizada con información de todos los programas académicos.
-* **Interfaz de Usuario**: Diseñar una interfaz amigable y accesible para todos los dispositivos.
-* **Sistema de Comparación**: Implementar un sistema que permita la comparación efectiva entre programas seleccionados por el usuario.
-* **Sistema de Recomendación**: Desarrollar un sistema que recomiende programas académicos basados en las habilidades de los usuario.
-* **Feedback de Usuarios**: Incorporar un mecanismo para que los usuarios puedan dejar comentarios y valoraciones sobre los programas.
+* **Interfaz de usuario**: Diseñar una interfaz amigable y accesible para todos los dispositivos.
+* **Sistema de comparación de carreras**: Implementar un sistema que permita la comparación efectiva entre programas seleccionados por el usuario.
+* **Sistema de Comparación de habilidades**: Implementar un sistema que permita comparar las habilidades de los estudiantes con las habilidades de los estudiantes que han cursado, se graduaron, se retiraron o fueron expulsados de un programa académico.
 
 ## Diagramas
 
@@ -28,19 +27,19 @@ El alcance principal del proyecto incluye:
 
 ### Diagrama de Clases
 
-![diagrama de clases](https://www.planttext.com/api/plantuml/svg/fLJBQiCm4BpxAtHCAVc1K4fBMagWX5Bw0njfOnPahRihvT3IVwyisubDA7tThD5eLhCxrer6a9WQNraFgkP9k1PeuDQ2muOic_VAcAKXjp8KOlaEtEm4LqQZKAWBv52jK6k9mnnF0Zqu7hQ2ZYBh5Yqg2B6EUvU6Tn43oYRiMPfoRd4naRiq5hnD7kG55FH1mAKZQ-yPUfK32kt9WZpZQoBjYct2yNeTTyViguzgi7o7RMu1D1ZYJzsIe8qiCz1oY93HsOM_TGHATG39RT-ZiYpQuMDbHYZp3qoki3rruredKTPEw36lhyho-kIdhFytjd58VnXDldQJ3_CQV9b2HqMTJsWGEvg-EBazsRZNc1n1YFWpBz2Yz-Hu3WRYJQWbI__1otfemvgRrcC4rtTzr3a6xTvZJJlArS7DKpbFscZo7uPGMxG4fTJlaZRDpcr9dJiFKOcaZIaNUCk-9iKMqyhRX0SOrSU0PfldhyToUJtxmRwWbFBLPEGTU4Qj-cWFUtrURZ2uxldw1000)
+![diagrama de clases](https://www.planttext.com/api/plantuml/png/XL71QiCm3BtxAqoEWnnwpQri37OPWx8FS6rr5NFY8IahO-pVPpTDh3QCtVpUa_IUP1yTitrb8Fjjh6qnT1O7AK_e7SRExeHmU2l4qV4HmajkE2KAMZaWiJox7ZIP9wyuIl4A8s-zu6VczYd5mdW29n2sqjc7_30_nlWbu-uTOvo2ZXa-rR1Sb1alFQfUBJReK5Vpxnt1V8aR0t-MjACu6NazHy_uopJZ0Em9FmJJe6c67bY0k1eJ19IA3ywFKRvMkpvE_B_Rdl-wsJIsRMrprzIxcdhXmXSvLrNfjcbQrAYxgRQBE0kRHRZ4DBy0)
 
 ### Diagrama de Casos de Uso
 
-![diagrama de casos de uso](https://www.planttext.com/api/plantuml/svg/TP9BJWCn38RtEOMNxQ8SW0LgW17g0ZIYWhsLk4FKFAh4WtY8Go6Eq8lX6QQZqiSo_dxzl-ruNXWpjy4hJoi6Jf1Tyy9WNIR3BaLLrYvkC6E03PerDhJaTq_GOOoD9wNGSCfG5MwjmyW4MA0QgZNbaY9wRT1IS2PriDO3rJQuw0fdjF8IefKQZM4fX0BUfD3b6sccpgcHJh2CTWK-5K05inbChjjYK29tegcGuo9SNC5ayFnNlmGNZMyjZOOdL2DxfWotnEWz5R3aHqsVUfxsySladN6oULZ4LSf1Xjl-nAu5UcEATamv8rGYg7Mlq8PRzExZG7BKqaw-_KRvMtXewJMT4bJUoP_ipTo7_R4xAjr927mgBMQN-dqSCcqCbNtqI4E3zzrrHF6do6cgljHSPkrkxnS0)
+![diagrama de casos de uso](https://www.planttext.com/api/plantuml/png/XP512i8m44NtEKKlq2i8rGek2uBxRpB8GDf89jruUaCjQPj6NMRc_Pd_9z31-UeiOJIC8P32LEZ8YnjW6mr3FMitrqyO31i4fzGef25KdLp_X8Vll7juz92aaHrpmPrjr1jQUbUof3N7RMb4wjrOHbX-mRTnvw9fT9Zhn_XiwTDLIuoghWy_dNr1rmOpfEGpGtAxQdV62IkxBxExaUa7_aOia-k4Mw8KS4laPju0)
 
 ### Diagrama de Actividades
 
-![diagrama de actividades](https://www.planttext.com/api/plantuml/svg/dL0x3i8m3Drp2c-KApG32DI13L69FQGkM4gToacu5LCFW4GlHWfKCBDPxsUzjmxHI4oTKwz3gNB7PCa8r1Xe75YhiaQ7rfBdZ2wslkkDv6il_YocCs6X5RLGFEuLMyzHnW7wcLij8LwGeGZZRQa0oihXcUGh00FsawWd_eWo0_Rz7br0ADY_x9iKhFcnwpypkQ4sTwtuEbKDtkNECJNG812tNhfPMHxGqYcd2uO-OHv9vwLyhzOvOvhj2G00)
+![diagrama de actividades](https://www.planttext.com/api/plantuml/png/pP112i9034NtFKMMxHNQXHHnARZn0EaajO7fH6R6XKVo75xCj1I4Mi6bcn32_-z_aZB6NDJdTCCe2ed1wuMnAQI7yf00QPImgo0F7A2ySweAWBfrJZHm0c8uSKmQq4Fha9wFKPmsffdyHoNfnM44mgopsYDqQ2csphSrsk0_kAO03YPRWlOwNZ6QmroH8svGrvAlY04xyK98l5LkI_P6iRUIPT2F9ot_RVwjxpnV)
 
 ### Wireframes
 
-![diagrama de entidad relación](./docs/imgs/New%20Wireframe%201.png)
+![diagrama de entidad relación](./imgs/New%20Wireframe%201.png)
 
 ## Getting Started
 
